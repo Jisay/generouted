@@ -1,22 +1,34 @@
 import { Fragment } from 'react'
-import { LoaderFn, Outlet, ReactLocation, Route, Router, RouterProps } from '@tanstack/react-location'
+import {
+  LoaderFn,
+  LoaderFnOptions,
+  Outlet,
+  ReactLocation,
+  Route,
+  RouteMatch,
+  Router,
+  RouterProps,
+} from '@tanstack/react-location'
 
 import { generatePreservedRoutes, generateRegularRoutes } from './core'
 
-type Element = () => JSX.Element
-type Module = { default: Element; Loader: LoaderFn; Pending: Element; Failure: Element }
+export type Element = () => JSX.Element
+export type Module = { default: Element; Loader: LoaderFn; Pending: Element; Failure: Element }
 
 const PRESERVED = import.meta.glob<Module>('/src/pages/(_app|404).{jsx,tsx}', { eager: true })
 const ROUTES = import.meta.glob<Module>(['/src/pages/**/[\\w[]*.{jsx,tsx}', '!**/(_app|404).*'])
 
 const preservedRoutes = generatePreservedRoutes<Element>(PRESERVED)
 
-const regularRoutes = generateRegularRoutes<Route, () => Promise<Module>>(ROUTES, (module) => ({
+export const buildRegularRoute = (module: () => Promise<Module>) => ({
   element: () => module().then((mod) => (mod?.default ? <mod.default /> : <></>)),
-  loader: async (...args) => module().then((mod) => mod?.Loader?.(...args)),
+  loader: async (...args: [routeMatch: RouteMatch, opts: LoaderFnOptions]) =>
+    module().then((mod) => mod?.Loader?.(...args)),
   pendingElement: async () => module().then((mod) => (mod?.Pending ? <mod.Pending /> : null)),
   errorElement: async () => module().then((mod) => (mod?.Failure ? <mod.Failure /> : null)),
-}))
+})
+
+const regularRoutes = generateRegularRoutes<Route, () => Promise<Module>>(ROUTES, buildRegularRoute)
 
 const App = preservedRoutes?.['_app'] || Fragment
 const NotFound = preservedRoutes?.['404'] || Fragment
