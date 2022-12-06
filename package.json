@@ -46,6 +46,10 @@
     "./solid-router": {
       "types": "./src/solid-router.tsx",
       "import": "./src/solid-router.tsx"
+    },
+    "./core": {
+      "types": "./src/core.ts",
+      "import": "./src/core.ts"
     }
   },
   "typesVersions": {
@@ -58,6 +62,9 @@
       ],
       "solid-router": [
         "./src/solid-router.tsx"
+      ],
+      "core": [
+        "./src/core.ts"
       ]
     }
   },

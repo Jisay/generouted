@@ -40,8 +40,8 @@ export const generateRegularRoutes = <T extends BaseRoute, M>(
       const insert = /^\w|\//.test(path) ? 'unshift' : 'push'
 
       if (root) {
-        const dynamic = path.startsWith(':') || path === '*'
-        if (dynamic) return parent
+        // const dynamic = path.startsWith(':') || path === '*'
+        // if (dynamic) return parent
 
         const last = segments.length === 1
         if (last) {
